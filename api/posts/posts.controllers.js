@@ -1,4 +1,4 @@
-const Post = require('../../models/Post');
+const Post = require("../../models/Post");
 
 exports.fetchPost = async (postId, next) => {
   try {
@@ -36,10 +36,10 @@ exports.postsUpdate = async (req, res) => {
   }
 };
 
-exports.postsGet = async (req, res) => {
+exports.postsGet = async (req, res, next) => {
   try {
     const posts = await Post.find();
-    res.json(posts);
+    return res.status(200).json(posts);
   } catch (error) {
     next(error);
   }
