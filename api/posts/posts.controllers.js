@@ -1,5 +1,5 @@
 const Post = require("../../models/Post");
-
+const Author = require("../../models/Author");
 exports.fetchPost = async (postId, next) => {
   try {
     const post = await Post.findById(postId);
@@ -9,9 +9,16 @@ exports.fetchPost = async (postId, next) => {
   }
 };
 
-exports.postsCreate = async (req, res) => {
+exports.postsCreate = async (req, res, next) => {
   try {
+    const { postId } = req.pramas;
+    const author = await Author.findById(postId);
+    if (!author) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    req.body.user = postId;
     const newPost = await Post.create(req.body);
+    await author.updateOne({ $push: { posts: newPost.postId } });
     res.status(201).json(newPost);
   } catch (error) {
     next(error);
