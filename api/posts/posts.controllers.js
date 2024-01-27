@@ -51,3 +51,27 @@ exports.postsGet = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.createTag = async (req, res, next) => {
+  try {
+    const tag = await Tag.create(req.body);
+    return res.status(201).json(tag);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.addTagToPoast = async (req, res, next) => {
+  try {
+    const { tagId, postId } = req.pramas;
+    const post = await Post.findById(postId);
+    const tag = await Tag.findById(tagId);
+    if (!post || !tag)
+      return res.status(404).json({ message: "post or tag not found" });
+    await Post.updateOne({ $push: { posts: post._id } });
+    await Tag.updateOne({ $push: { tags: tag._id } });
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
